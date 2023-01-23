@@ -55,3 +55,5 @@ declare -a StringArrayFull=(
 for val in ${StringArrayFull[@]}; do
 	echo $i
 	sbatch singular_prosumer.sh $val $1
+
+done
