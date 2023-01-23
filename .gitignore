@@ -1,0 +1,15 @@
+experiments/cnf/prosumer/figs*
+experiments*
+out*
+__pycache__/*
+*/__pycache__/*
+.vscode
+wandb/
+image*
+old_out*
+train_script.sh
+train_script_2.sh
+data/prosumer
+data/pi_b_logs
+best_pth/
+oldgit/
