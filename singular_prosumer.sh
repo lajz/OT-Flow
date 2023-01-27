@@ -41,4 +41,3 @@ python trainLargeOTflow.py \
 --use_num_days_data 365 \
 --prosumer_name $1
 
-done

@@ -31,6 +31,7 @@ parser.add_argument('--long_version'  , action='store_true')
 # default is: args.long_version=False , passing  --long_version will take a long time to run to get values for paper
 args = parser.parse_args()
 
+print(f"split path: {args.data_split_path}")
 # logger
 args.save, sPath = os.path.split(args.resume)
 utils.makedirs(args.save)
