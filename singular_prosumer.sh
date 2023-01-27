@@ -29,7 +29,7 @@ split_path=${2}/${1}
 
 python trainLargeOTflow.py \
 --data prosumer \
---data_split_path split_path \
+--data_split_path ${split_path} \
 --m 256 \
 --batch_size 64 \
 --test_batch_size 64 \
