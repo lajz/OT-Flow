@@ -28,6 +28,6 @@ source otEnv/bin/activate
 split_path=${2}/${1}
 
 python gensynth.py \
---experiment_folder_path reward_evaluation_new \
+--experiment_folder_path experiments/cnf/reward_evaluation_new \
 --raw_data_folder_name reward_evaluation_new \
 --use_num_days_data 365
