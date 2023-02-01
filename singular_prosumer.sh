@@ -38,6 +38,6 @@ python trainLargeOTflow.py \
 --alph_C=500 \
 --alph_R=15 \
 --weight_decay 0.08 \
---use_num_days_data 365 \
+--use_num_days_data 1090 \
 --prosumer_name $1
 
