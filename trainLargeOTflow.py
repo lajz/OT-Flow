@@ -11,6 +11,7 @@ import numpy as np
 import math
 import lib.toy_data as toy_data
 import lib.utils as utils
+import fcntl
 from lib.utils import count_parameters
 
 from src.mmd import mmd
@@ -323,15 +324,21 @@ if __name__ == '__main__':
                         }, save_path)
                         prosumer_checkpoints_dict_path = os.path.join(args.save, "prosumer_checkpoints_dict.json")
                         if os.path.isfile(prosumer_checkpoints_dict_path):
-                            with open(prosumer_checkpoints_dict_path, "r") as jsonFile:
+                            with open(prosumer_checkpoints_dict_path, "r+") as jsonFile:
+                                fcntl.flock(jsonFile, fcntl.LOCK_EX)
                                 prosumer_data = json.load(jsonFile)
+                                prosumer_data.setdefault(args.prosumer_name, {})["latest"] = save_path
+                                jsonFile.seek(0)
+                                prosumer_data = json.dump(prosumer_data, jsonFile)
+                                jsonFile.truncate()
+                                fcntl.flock(jsonFile, fcntl.LOCK_UN)
                         else:
-                            prosumer_data = {}
-                        
-                        prosumer_data.setdefault(args.prosumer_name, {})["latest"] = save_path
-                        
-                        with open(prosumer_checkpoints_dict_path, "w") as jsonFile:
-                            prosumer_data = json.dump(prosumer_data, jsonFile)
+                            prosumer_data = {}                        
+                            with open(prosumer_checkpoints_dict_path, "w") as jsonFile:
+                                fcntl.flock(jsonFile, fcntl.LOCK_EX)
+                                prosumer_data = json.dump(prosumer_data, jsonFile)
+                                fcntl.flock(jsonFile, fcntl.LOCK_UN)
+                            
                     else:
                         n_vals_wo_improve+=1
 
