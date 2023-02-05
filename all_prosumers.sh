@@ -52,7 +52,12 @@ declare -a StringArrayFull=(
 	"Hog_services_Adrianna.csv" 
 )
 
-for val in ${StringArrayFull[@]}; do
+declare -a StringArray=(
+	"Hog_assembly_Jasmine.csv"
+	"Hog_education_Casandra.csv"
+)
+
+for val in ${StringArray[@]}; do
 	echo $i
 	sbatch singular_prosumer.sh $val $1
 
