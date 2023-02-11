@@ -166,9 +166,11 @@ def run_prosumer(prosumer_name):
         iterations = 0
         while idx < nSamples:
         
-            for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=64))):
+            for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=200, shuffle=True))):
                 y = cvt(y)  # (nGen, 73) put on device with proper precision
                 iterations += 1
+                if iterations %1000 == 0:
+                    print (f"Reached {iterations} iterations")
                 if iterations > nSamples * 10:
                     print(f"Exited {prosumer_name}")
                     return False
