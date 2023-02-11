@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--experiment_folder_path', default="experiments/cnf/random_prices_o25_s25", type=str)
 parser.add_argument('--raw_data_folder_name', default="random_prices_o25_s25", type=str)
 parser.add_argument('--use_num_days_data', default=365, type=int)
-
+parser.add_argument('--generate_num_days_data', default=5000, type=int)
 args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -122,7 +122,7 @@ for prosumer_name in models.keys():
     print(f"using real data from pi_b_logs/{prosumer_name}.csv")
 
     trainData = torch.from_numpy(data.trn.x)  # x sampled from unknown rho_0
-    nSamples = 10000 # ! modify number of samples to generate
+    nSamples = args.generate_num_days_data # ! modify number of samples to generate
     normSamples = torch.randn(nSamples, trainData.shape[1])  # y ~ rho_1 : (nSamples, features)
 
     d = trainData.shape[1] # pure stochasticity is 73
@@ -163,18 +163,28 @@ for prosumer_name in models.keys():
         # generate samples
         print("generating samples")
         idx = 0
-        for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=10000))):
-            y = cvt(y)  # (nGen, 73) put on device with proper precision
+        while idx < nSamples:
+        
+            for i, y in tqdm(enumerate(batc = batch_iter(normSamples, batch_size=64))):
+                y = cvt(y)  # (nGen, 73) put on device with proper precision
 
-            # finvy is our generated sample from gaussian y
-            finvy = integrate(y[:, 0:d], net, [1.0, 0.0], nt_test, stepper="rk4", alph=net.alph) # (nGen 76) -- includes [L, C, R]
-            batchSz = y.shape[0]
-            assert (y.shape[1] == d), f"normSample has {y.shape[1]}-dim gaussian instead of d={d}"  # no reason for it not to equal the same
+                # finvy is our generated sample from gaussian y
+                finvy = integrate(y[:, 0:d], net, [1.0, 0.0], nt_test, stepper="rk4", alph=net.alph) # (nGen 76) -- includes [L, C, R]
+                batchSz = y.shape[0]
+                assert (y.shape[1] == d), f"normSample has {y.shape[1]}-dim gaussian instead of d={d}"  # no reason for it not to equal the same
 
-            synthetic = finvy[:, 0:d].detach().cpu().numpy()  # synthetic data
+                synthetic = finvy[:, 0:d].detach().cpu().numpy()  # synthetic data
 
-            modelGen[idx : idx + batchSz, 0:d] = synthetic  # populate synthetic in one place
-            idx = idx + batchSz
+                valid_gens = []
+                for i in synthetic.shape[0]:
+                    if idx + len(valid_gens) >= nSamples:
+                        break
+                    synth_gen = synthetic[i, 0:d]
+                    if np.min(synth_gen) > -1.5 and  np.max(synth_gen) < 1.5:
+                        valid_gens.append(synth_gen)
+                
+                modelGen[idx : idx + len(valid_gens), 0:d] = np.stack(valid_gens, axis=0)  # populate synthetic in one place
+                idx = idx + len(valid_gens)
 
     # data_path is pi_b, model spits out 72-dim
 
