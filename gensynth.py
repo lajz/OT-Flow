@@ -180,11 +180,12 @@ for prosumer_name in models.keys():
                     if idx + len(valid_gens) >= nSamples:
                         break
                     synth_gen = synthetic[i, 0:d]
+                    print(f"t min: {np.min(synth_gen)} max: {np.max(synth_gen)}")
                     if np.min(synth_gen) > -1.5 and  np.max(synth_gen) < 1.5:
                         valid_gens.append(synth_gen)
-                
-                modelGen[idx : idx + len(valid_gens), 0:d] = np.stack(valid_gens, axis=0)  # populate synthetic in one place
-                idx = idx + len(valid_gens)
+                if len(valid_gens) > 0:
+                    modelGen[idx : idx + len(valid_gens), 0:d] = np.stack(valid_gens, axis=0)  # populate synthetic in one place
+                    idx = idx + len(valid_gens)
 
     # data_path is pi_b, model spits out 72-dim
 
