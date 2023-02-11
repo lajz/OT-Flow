@@ -165,7 +165,7 @@ for prosumer_name in models.keys():
         idx = 0
         while idx < nSamples:
         
-            for i, y in tqdm(enumerate(batc = batch_iter(normSamples, batch_size=64))):
+            for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=64))):
                 y = cvt(y)  # (nGen, 73) put on device with proper precision
 
                 # finvy is our generated sample from gaussian y
