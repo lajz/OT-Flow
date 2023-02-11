@@ -170,6 +170,7 @@ def run_prosumer(prosumer_name):
                 y = cvt(y)  # (nGen, 73) put on device with proper precision
                 iterations += 1
                 if iterations > nSamples * 10:
+                    print(f"Exited {prosumer_name}")
                     return False
                 # finvy is our generated sample from gaussian y
                 finvy = integrate(y[:, 0:d], net, [1.0, 0.0], nt_test, stepper="rk4", alph=net.alph) # (nGen 76) -- includes [L, C, R]
