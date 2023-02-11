@@ -114,8 +114,8 @@ def compute_loss(net, x, nt):
 
 def unnorm(arr, split): # util function to unnormalize data
     return data.scalers[split].inverse_transform(arr)
-
-for prosumer_name in models.keys():
+    
+def run_prosumer(prosumer_name):
     print(f"creating data for {prosumer_name} with model from {models[prosumer_name]}")
     model_path = models[prosumer_name]
     data = datasets.PROSUMER(f"{args.raw_data_folder_name}/{prosumer_name}.csv", args.use_num_days_data) # real data
@@ -163,11 +163,14 @@ for prosumer_name in models.keys():
         # generate samples
         print("generating samples")
         idx = 0
+        iterations = 0
         while idx < nSamples:
         
             for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=64))):
                 y = cvt(y)  # (nGen, 73) put on device with proper precision
-
+                iterations += 1
+                if iterations > nSamples * 10:
+                    return False
                 # finvy is our generated sample from gaussian y
                 finvy = integrate(y[:, 0:d], net, [1.0, 0.0], nt_test, stepper="rk4", alph=net.alph) # (nGen 76) -- includes [L, C, R]
                 batchSz = y.shape[0]
@@ -186,6 +189,7 @@ for prosumer_name in models.keys():
                     modelGen[idx : idx + len(valid_gens), 0:d] = np.stack(valid_gens, axis=0)  # populate synthetic in one place
                     idx = idx + len(valid_gens)
 
+    
     # data_path is pi_b, model spits out 72-dim
 
     # todo: comment out modelFx since this is just forward pass of flow
@@ -218,10 +222,24 @@ for prosumer_name in models.keys():
             new_col = full_digit_day
         
         unnormalized_d[col_name] = new_col
-        
+    
+    print(f"Completed {prosumer_name}")
     new_df = pd.DataFrame(unnormalized_d)
     out_dir = Path("synth_data").joinpath(args.raw_data_folder_name).joinpath(f"days_{args.use_num_days_data}")
     out_dir.mkdir(parents=True, exist_ok=True)
     new_df.to_csv(out_dir.joinpath(f"{prosumer_name}.csv"), index=False)
+    return True
 
+prosumers_completed = []
+prosumers_not_completed = []
+for prosumer_name in models.keys():
+    if (run_prosumer(prosumer_name)):
+        prosumers_completed.append(prosumer_name)
+    else:
+        prosumers_not_completed.append(prosumer_name)
+    
 # todo visualize prices somehow
+print("Prosumers Completed")
+print(prosumers_completed)
+print("Prosumers Not Completed")
+print(prosumers_not_completed)
