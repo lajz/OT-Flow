@@ -176,7 +176,7 @@ for prosumer_name in models.keys():
                 synthetic = finvy[:, 0:d].detach().cpu().numpy()  # synthetic data
 
                 valid_gens = []
-                for i in synthetic.shape[0]:
+                for i in range(synthetic.shape[0]):
                     if idx + len(valid_gens) >= nSamples:
                         break
                     synth_gen = synthetic[i, 0:d]
