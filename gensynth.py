@@ -112,7 +112,7 @@ def compute_loss(net, x, nt):
     Jc, cs = OTFlowProblem(x, net, [0, 1], nt=nt, stepper="rk4", alph=net.alph)
     return Jc, cs
 
-def unnorm(arr, split): # util function to unnormalize data
+def unnorm(arr, split, data): # util function to unnormalize data
     return data.scalers[split].inverse_transform(arr)
     
 def run_prosumer(prosumer_name):
@@ -211,7 +211,7 @@ def run_prosumer(prosumer_name):
         
         print(f"Min: {np.min(modelGen[:, i])} | Max {np.max(modelGen[:, i])}")
         # check these scales make sense (some of the actions are out of scale)
-        new_col = unnorm(modelGen[:, i].reshape(-1, 1), col_scaler).reshape(-1)
+        new_col = unnorm(modelGen[:, i].reshape(-1, 1), col_scaler, data).reshape(-1)
         
         if "day" in col_name:
             full_digit_day = np.round(new_col, decimals=0)
