@@ -57,7 +57,7 @@ declare -a StringArray=(
 	"Hog_education_Casandra.csv"
 )
 
-for val in ${StringArray[@]}; do
+for val in ${StringArrayFull[@]}; do
 	echo $i
 	sbatch singular_prosumer.sh $val $1
 
