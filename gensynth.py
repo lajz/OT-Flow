@@ -180,7 +180,6 @@ for prosumer_name in models.keys():
                     if idx + len(valid_gens) >= nSamples:
                         break
                     synth_gen = synthetic[i, 0:d]
-                    print(f"t min: {np.min(synth_gen)} max: {np.max(synth_gen)}")
                     if np.min(synth_gen) > -1.5 and  np.max(synth_gen) < 1.5:
                         valid_gens.append(synth_gen)
                 if len(valid_gens) > 0:
