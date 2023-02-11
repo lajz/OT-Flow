@@ -166,7 +166,7 @@ def run_prosumer(prosumer_name):
         iterations = 0
         while idx < nSamples:
         
-            for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=200, shuffle=True))):
+            for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=2000, shuffle=True))):
                 y = cvt(y)  # (nGen, 73) put on device with proper precision
                 iterations += 1
                 if iterations %1000 == 0:
