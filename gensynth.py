@@ -168,15 +168,16 @@ def run_prosumer(prosumer_name):
         
             for i, y in tqdm(enumerate(batch_iter(normSamples, batch_size=2000, shuffle=True))):
                 y = cvt(y)  # (nGen, 73) put on device with proper precision
-                iterations += 1
-                if iterations %1000 == 0:
-                    print (f"Reached {iterations} iterations")
+                batchSz = y.shape[0]
+                if iterations > 20 * nSamples:
+                    return False
+                iterations += batchSz
+                print (f"Reached {iterations} iterations")
                 if iterations > nSamples * 10:
                     print(f"Exited {prosumer_name}")
                     return False
                 # finvy is our generated sample from gaussian y
                 finvy = integrate(y[:, 0:d], net, [1.0, 0.0], nt_test, stepper="rk4", alph=net.alph) # (nGen 76) -- includes [L, C, R]
-                batchSz = y.shape[0]
                 assert (y.shape[1] == d), f"normSample has {y.shape[1]}-dim gaussian instead of d={d}"  # no reason for it not to equal the same
 
                 synthetic = finvy[:, 0:d].detach().cpu().numpy()  # synthetic data
